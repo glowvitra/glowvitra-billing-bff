@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: glowvitra-billing-bff-app
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      LOG_LEVEL: ${LOG_LEVEL}
+      PRETTY_PRINT_LOG: ${PRETTY_PRINT_LOG}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+      SWAGGER_USER: ${SWAGGER_USER}
+      SWAGGER_PASSWORD: ${SWAGGER_PASSWORD}
+      API_SERVER_URL: ${API_SERVER_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY: ${JWT_EXPIRY}
+    ports:
+      - '${PORT:-3500}:3500'
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:${PORT:-3500}/api/status',
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - glowvitra-network
+
+networks:
+  glowvitra-network:
+    driver: bridge
